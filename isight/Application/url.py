@@ -14,8 +14,9 @@ urlpatterns = [
     path('hello', views.hello, name='hello'),
     path('training', views.training, name='training'),
 
-    path('xmlApi', views.xmlApi, name='xmlApi'),
-    path('pdfApi', views.pdfApi, name='pdfApi'),
-    path('FaceNameApi', views.FaceNameApi, name='FaceNameApi'),
+  
+    path('pdfApi/<str:pk>/', views.pdfApi, name='pdfApi'),
+    path('FaceNameApi/<str:pk>/', views.FaceNameApi, name='FaceNameApi'),
+    path('xmlfile/<str:pk>/', views.xmlfile, name='xmlfile'),
 
 ]

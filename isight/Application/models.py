@@ -23,17 +23,26 @@ class pdf(models.Model):
     thumbnail = models.FileField(null=True,blank=True)
     title = models.CharField(max_length=200)
     desp = models.CharField(max_length=200)
+    def __str__(self):
+        return str(self.title)
 
 
 class Image(models.Model):
     User = models.ForeignKey(User, null=True ,  on_delete= models.SET_NULL)
     name = models.CharField(max_length=200, null=True,blank=True)
     imagestore = models.FileField(null=True)
+    def __str__(self):
+        return str(self.User)
 
 class FaceName(models.Model):
+    User = models.ForeignKey(User, null=True ,  on_delete= models.SET_NULL)
     name = models.CharField(max_length=200)
     ids = models.PositiveIntegerField()
+    def __str__(self):
+        return str(self.name)
 
-# class ymlfile(models.Model):
-#     name = models.CharField(max_length=200)
-#     ids = models.PositiveIntegerField()
+class ymlfile(models.Model):
+    User = models.ForeignKey(User, null=True ,  on_delete= models.SET_NULL)
+    xmlfile = models.FileField(null=True)
+    def __str__(self):
+        return str(self.User)

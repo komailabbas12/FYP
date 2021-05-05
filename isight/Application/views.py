@@ -7,12 +7,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 import numpy as np
 import cv2
 import PIL.Image
 from django.core import serializers
 import os
 from .form import *
+from .serializer import *
 # from .haarcascade_frontalface_default.xml import *
 from .models import *
 import numpy as np
@@ -259,7 +261,7 @@ def hello(request):
 
     # Close all started windows
     cv2.destroyAllWindows()
-    res=FaceName.objects.create(name=request.POST['name'],ids=face_id)
+    res=FaceName.objects.create(User=User.objects.get(id=request.user.pk), name=request.POST['name'],ids=face_id)
     print(res)
 
     return redirect('imagess')
@@ -330,41 +332,43 @@ def training(request):
 
 ################################################### Creating API ###################################################
 
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-def xmlApi(request):
-    # if request.method == 'GET':
-
-    # abc=
-    with open("C:\\Users\\abbas\\Desktop\\final try\\FYP\\isight\\trainer\\trainer.yml", 'r') as stream:
-        try:
-            print(yaml.safe_load(stream))
-        except yaml.YAMLError as exc:
-            print(exc)
-    files = glob.glob('C:\\Users\\abbas\\Desktop\\final try\\FYP\\isight\\trainer\\trainer.yml')
-    # print(files)
-    # one_h_ago = timezone.now() - timezone.timedelta(hours=1)
-
-    # queryset = Post.objects.filter(date_time__gte=one_h_ago)
-    context={
-        'abc':files
-    }
-    # serializer_class = lasthourpostsSerializer(queryset, many=True)
-    return Response(files)
-
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
-def pdfApi(request):
-    allpdfs=pdf.objects.filter(User=request.user)
-    data = serializers.serialize('json', allpdfs)
+def pdfApi(request , pk):
+    find_productid = ProductID.objects.get(Productid=pk)
+    finduser = CustomerProd.objects.get(customerid=find_productid)
+    User = get_user_model()
+    users = User.objects.get(username=finduser.User)
+    allpdfs = pdf.objects.filter(User=users.pk)
+    serializer = PDFSerializer(allpdfs, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def xmlfile(request , pk):
+    find_productid = ProductID.objects.get(Productid=pk)
+    finduser = CustomerProd.objects.get(customerid=find_productid)
+    User = get_user_model()
+    users = User.objects.get(username=finduser.User)
+    xmlfile = ymlfile.objects.filter(User=users.pk)
+    serializer = XmlfileSerializer(xmlfile, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def FaceNameApi(request, pk):
+    find_productid = ProductID.objects.get(Productid=pk)
+    finduser = CustomerProd.objects.get(customerid=find_productid)
+    User = get_user_model()
+    users = User.objects.get(username=finduser.User)
+    findFaceName = FaceName.objects.filter(User=users.pk)
+    # print("#################################")
+    # print(pk)
+    # print(find_productid)
+    # print(finduser.User)
+    # print("dsd",users.pk)
+    # print(findFaceName)
+    # print("########################################")
+    serializer = FacesSerializer(findFaceName, many=True)
+    #data = serializers.serialize('json', findFaceName)
     # return HttpResponse(data, content_type="application/json")
-    return Response(data)
-
-@api_view(['GET'])
-@permission_classes((AllowAny,))
-def FaceNameApi(request):
-    allFaceName = FaceName.objects.all()
-    data = serializers.serialize('json', allFaceName)
-    # return HttpResponse(data, content_type="application/json")
-    return Response(data)
+    return Response(serializer.data)
