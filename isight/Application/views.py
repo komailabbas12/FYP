@@ -1,16 +1,25 @@
 from xml.dom import minidom
-
+import tempfile
 from django.http import HttpResponse
+from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.http import StreamingHttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 import numpy as np
+from django.http import HttpResponseRedirect
 import cv2
+from knox import *
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
 import PIL.Image
+from PIL import ImageOps
+from PIL import Image  as con
 from django.core import serializers
 import os
 from .form import *
@@ -29,6 +38,11 @@ from rest_framework import generics, permissions
 from django.core.files.base import ContentFile
 import yaml
 import glob
+import threading
+
+from rest_framework import permissions
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from knox.views import LoginView as KnoxLoginView
 
 def loginTest(request):
     global userid
@@ -47,16 +61,19 @@ def loginTest(request):
             messages.info(request, 'Username or Password was incorrect!')
 
     return render(request, 'Application/login.html')
-
+def info(request):
+    if request.method== "POST":
+        return render(request, 'Application/Info.html')
+    return render(request, 'Application/Info.html')
 
 def signup(request):
     form = RegisterUser()
     if request.method == "POST":
         form = RegisterUser(request.POST)
         print('-------------------form print-----------------')
-        print(form)
         Productid = ProductID.objects.all()
         pid = request.POST['pid']
+        
         idexist = False
         ProdExist = False
 
@@ -79,29 +96,44 @@ def signup(request):
         if ProdExist == True:
             print("one user is already register that product ")
         else:
+            print("else")
             if form.is_valid():
-                instance = form.save()
-                # print(instance.pk)
-                print('------------------------------------')
-                ##instance.User = request.user
+                
+                # instance.User = request.user
                 user = form.cleaned_data.get("username")
-                # print(instance.id)
+                password1 = str(form.cleaned_data.get("password1"))
+                password2 = str(form.cleaned_data.get("password2"))
+                
+                
                 
                 p = ProductID.objects.get(Productid=request.POST['pid'])
                 print('------------------------------------')
-                print("asd" ,p)
+                print(p)
+                if not p:
+                    print("none")
+                    messages.info(request, 'Please Check your Product Id number. If you do not have then Purchase isight')
+                    context = {'form': form}
+                    return render(request, 'Application/signup.html', context)
+                
+                instance = form.save()
                 CustomerProd.objects.create(User=User.objects.get(id=instance.id), customerid=p)
+                messages.info(request, 'Sign up successfully! kindly login to Continue')
                 return redirect('login')
             else:
-                messages.info(request, 'This Username Already exist!')
-                print("user already exit ")
+                password1 = str(form.cleaned_data.get("password1"))
+                password2 = str(form.cleaned_data.get("password2"))
+                if (password1 != password2):
+                     messages.info(request, 'Incorrect Confirm Password')
+                else:
+                    messages.info(request, 'This Username Already exist!')
+                
     context = {'form': form}
     return render(request, 'Application/signup.html', context)
 
 
 @login_required(login_url='login')
 def home(request):
-    allimages = Image.objects.filter(User=request.user).count()
+    allimages = FaceName.objects.filter(User=request.user).count()
     allpdfs = pdf.objects.filter(User=request.user).count()
     context = {
         'allimg':allimages ,
@@ -132,12 +164,17 @@ def pdfs(request):
 
 @login_required(login_url='login')
 def imagess(request):
+    print("redirectttttttttttttt")
     if request.method== 'POST':
-        img = request.FILES['imgs']
-        nameu = request.POST['name']
-        
-        Image.objects.create(User=User.objects.get(id=request.user.pk) , imagestore = img , name = nameu)
-    
+        print("redirect from camera")
+    else:
+        print("in else")
+        allimages = FaceName.objects.filter(User=request.user)
+        context={
+            'allimg' : allimages
+        }  
+        return render(request, 'Application/imagess.html' , context)
+
     allimages = Image.objects.filter(User=request.user)
     context={
         'allimg' : allimages
@@ -149,7 +186,7 @@ def imagess(request):
 @login_required(login_url='login')
 def pdfDelete(request,id):
     # if request.method== 'POST':
-    pdf.objects.get(id=id).delete()
+    pdf.objects.get(id=id).delete() 
     allPdf =pdf.objects.filter(User=request.user)
     # for p in allPdf:
         # print("http://127.0.0.1:8000/"+p.thumbnail)
@@ -163,8 +200,9 @@ def pdfDelete(request,id):
 @login_required(login_url='login')
 def imgDelete(request,id):
     # if request.method== 'POST':
-    Image.objects.get(id=id).delete()
-    allimages = Image.objects.filter(User=request.user)
+    Image.objects.filter(name=id).delete()
+    FaceName.objects.filter(name = id).delete()
+    allimages = FaceName.objects.filter(User=request.user)
     # for p in allPdf:
         # print("http://127.0.0.1:8000/"+p.thumbnail)
     
@@ -181,157 +219,119 @@ def out(request):
     return redirect('login')
 
 
-# Import OpenCV2 for image processing
+face_detector = cv2.CascadeClassifier('C:\\Users\\abbas\\Desktop\\final try\\FYP\\isight\\Application\\haarcascade_frontalface_default.xml')
 
-def hello(request):
-    print('asim')
-    acd=FaceName.objects.all().count()
+def face_extractor(img):
 
-    def assure_path_exists(path):
-        dir = os.path.dirname(path)
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-    print('raza')
-    # Start capturing video
-    vid_cam = cv2.VideoCapture(0)
-    # xmldoc = minidom.parse('haarcascade_frontalface_default.xml')
-    # Detect object in video stream using Haarcascade Frontal Face
-    face_detector = cv2.CascadeClassifier('C:\\Users\\abbas\\Desktop\\final try\\FYP\\isight\\Application\\haarcascade_frontalface_default.xml')
+    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    faces = face_detector.detectMultiScale(gray,1.3,5)
+
+    if faces is None:
+        return None
+    global cropped_face
+    for(x,y,w,h) in faces:
+        cropped_face = img[y:y+h, x:x+w]
+
+    return cropped_face
 
 
-    # For each person, one face id
-    face_id = acd+1
+def hello(request): 
+    if request.method == "POST":
+        print("check")
+        F_name = request.POST['name']
+        user_video = request.FILES['vide'] 
+        print("checkk")
+        print(type(user_video))
+        videoSave = videoStore.objects.create(User=User.objects.get(id=request.user.pk) , videoFile = user_video)
+        print(videoSave.pk)
+        get_path_video = videoStore.objects.get(pk = videoSave.pk)
+        print(get_path_video.videoFile)
+        accurate_path = "http://127.0.0.1:8000/media/" + str(get_path_video.videoFile)
+        print(accurate_path)
 
-    # Initialize sample face image
-    count = 0
-
-    assure_path_exists("dataset/")
-
-    # Start looping
-    while(True):
-
-        # Capture video frame
-        _, image_frame = vid_cam.read()
-
-        # Convert frame to grayscale
-        gray = cv2.cvtColor(image_frame, cv2.COLOR_BGR2GRAY)
-
-        # Detect frames of different sizes, list of faces rectangles
-        faces = face_detector.detectMultiScale(gray, 1.3, 5)
-
-        # Loops for each faces
-        for (x,y,w,h) in faces:
-
-            # Crop the image frame into rectangle
-            cv2.rectangle(image_frame, (x,y), (x+w,y+h), (255,0,0), 2)
-
-            # Increment sample face image
-            count += 1
-
-            # Save the captured image into the datasets folder
-            has = cv2.imwrite("static/pdfbook/images/User." + str(face_id) + '.' + str(count) + ".jpg", gray[y:y+h,x:x+w])
-            print("has" , has)
-            c = 'C:\\Users\\abbas\\Desktop\\final try\\FYP\\isight\\static\\pdfbook\\images\\' + "User." + str(face_id) + '.' + str(count) + ".jpg"
-            im = cv2.imread(c)
-
-            #############################dataset/
-
-
-            nameu = "unknown"
-            Image.objects.create(User=userid, imagestore= c, name=nameu)
-
-
-            #############################
-            face = cv2.resize(image_frame, (400, 400))
-            face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
-            cv2.putText(face, str(count), (50, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
-            # Display the video frame, with bounded rectangle on the person's face
-            cv2.imshow('frame', face)
-
-        # To stop taking video, press 'q' for at least 100ms
-        if cv2.waitKey(100) & 0xFF == ord('q'):
-            break
-
-        # If image taken reach 100, stop taking video
-        elif count>100:
-            break
-
-    # Stop video
-    vid_cam.release()
-
-    # Close all started windows
-    cv2.destroyAllWindows()
-    res=FaceName.objects.create(User=User.objects.get(id=request.user.pk), name=request.POST['name'],ids=face_id)
-    print(res)
-
+        faceCount = FaceName.objects.all().count()
+        face_id = faceCount + 1
+        count =0
+        # print(user_video)
+        video = cv2.VideoCapture(accurate_path)
+        # Detect object in video stream using Haarcascade Frontal Face
+        while True:
+                # Capture video frame
+            cc, frame = video.read()
+            
+            if face_extractor(frame) is not None:
+                count+=1
+                face = cv2.resize(face_extractor(frame),(200,200))
+                face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+                has = cv2.imwrite("static/pdfbook/User." + str(face_id) + '.' + str(count) + ".jpg", face)
+                c =  "User." + str(face_id) + '.' + str(count) + ".jpg"
+                
+                Image.objects.create(User=User.objects.get(id=request.user.pk),  name=F_name , imagestore= c )
+            else:
+                print("Face not found")
+                pass
+            if count == 100:
+                break  
+                
+                
+    video.release() 
+    FaceName.objects.create(User=User.objects.get(id=request.user.pk) , name = F_name , ids = face_id)         
     return redirect('imagess')
 
 def training(request):
-    def assure_path_exists(path):
-        dir = os.path.dirname(path)
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-
+    
     # Create Local Binary Patterns Histograms for face recognization
     recognizer = cv2.face.LBPHFaceRecognizer_create()
 
     # Using prebuilt frontal face training model, for face detection
-    detector = cv2.CascadeClassifier('C:\\Users\\abbas\\Desktop\\final try\\FYP\\isight\\Application\\haarcascade_frontalface_default.xml');
+    detector = cv2.CascadeClassifier('C:\\Users\\abbas\\Desktop\\final try\\FYP\\isight\\Application\\haarcascade_frontalface_default.xml')
 
-    # Create method to get the images and label data
-    def getImagesAndLabels(path):
-
-        # Get all file path
-        imagePaths = [os.path.join(path, f) for f in os.listdir(path)]
-
-        # Initialize empty face sample
-        faceSamples = []
-
-        # Initialize empty id
-        ids = []
-
-        # Loop all the file path
-        for imagePath in imagePaths:
-
-            # Get the image and convert it to grayscale
-
-            PIL_img = PIL.Image.open(imagePath).convert('L')
-
+    getImages = Image.objects.filter(User=request.user)
+    faceSamples = []
+    ids = []
+    count = 0
+    for images in getImages:
+        count = count + 1
+        print("fsdfsdf")
+        print(images.imagestore)
+        PIL_img = PIL.Image.open(images.imagestore).convert('L')
+        # gray_image = ImageOps.grayscale(PIL_img)
             # PIL image to numpy array
-            img_numpy = np.array(PIL_img, 'uint8')
-
-            # Get the image id
-            id = int(os.path.split(imagePath)[-1].split(".")[1])
+        img_numpy = np.array(PIL_img, 'uint8')
+        
+        
+        id = int(os.path.split(str(images.imagestore))[-1].split(".")[1])
 
             # Get the face from the training images
-            faces = detector.detectMultiScale(img_numpy)
+        faces = detector.detectMultiScale(img_numpy)
+        for (x, y, w, h) in faces:
+                # Add the image to face samples
+            faceSamples.append(img_numpy[y:y + h, x:x + w])
+                # Add the ID to IDs
+            ids.append(id)
 
             # Loop for each face, append to their respective ID
-            for (x, y, w, h) in faces:
-                # Add the image to face samples
-                faceSamples.append(img_numpy[y:y + h, x:x + w])
-
-                # Add the ID to IDs
-                ids.append(id)
-
-        # Pass the face array and IDs array
-        return faceSamples, ids
-
-    # Get the faces and IDs
-    faces, ids = getImagesAndLabels('C:\\Users\\abbas\\Desktop\\final try\\FYP\\isight\\static\\pdfbook\\images\\')
-    print(faces)
-
-    # Train the model using the faces and IDs
-    recognizer.train(faces, np.array(ids))
-
-    # Save the model into trainer.yml
-    assure_path_exists('trainer/')
-    recognizer.save('trainer/trainer.yml')
+        
+        
+    
+    # # Train the model using the faces and IDs
+    print(ids)
+    print("#############")
+    print(faceSamples)
+    recognizer.train(faceSamples, np.array(ids))
+    
+    
+    v = "static/pdfbook/" + str(request.user) + "trainer.yml"
+    print(v)
+    recognizer.save(v)
+    print(v)
+    d = str(request.user) + "trainer.yml"
+    ymlfile.objects.create(User=User.objects.get(id=request.user.pk) , xmlfile= d)
     return redirect('imagess')
-
-
 ################################################### Creating API ###################################################
 
+
+    
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
@@ -372,3 +372,109 @@ def FaceNameApi(request, pk):
     #data = serializers.serialize('json', findFaceName)
     # return HttpResponse(data, content_type="application/json")
     return Response(serializer.data)
+
+#login API aik sec waitok
+@api_view(["POST"])
+@csrf_exempt
+def loginapi(request):
+    permission_classes = (permissions.AllowAny,)
+    serializer = AuthTokenSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        login(request, user)
+        return Response({'user':user.username, 'user_id': user.id,})
+    else:
+        return Response(" Please Enter correct Username or password") # where is virtual environment
+ # signup API
+
+@api_view(["POST"])
+@permission_classes((AllowAny,))
+def signupapi(request):
+    username = request.data.get('username')
+    password = request.data.get("password")
+    p_id = request.data.get("id")
+    
+    Productid = ProductID.objects.all()
+    idexist = False
+    ProdExist = False
+
+     ## check if the Product id is exist
+    for x in Productid:
+        if x.Productid == p_id:
+            idexist = True
+        
+        ## check if the product is not register already
+    if idexist == True:
+        alreadyExist = CustomerProd.objects.all()
+        print('------------------------------------')
+        print(alreadyExist)
+        for exist in alreadyExist:
+            temp = str(exist)
+            if temp == p_id:
+                ProdExist = True
+                return Response({"msg":"One User is Already Register with this Product Id"})
+
+    if ProdExist == True:
+        print("one user is already register that product ")
+    else:
+        p = ProductID.objects.get(Productid=p_id)
+        if not p:
+            print("none")
+            return Response({"msg":"Product Id is incorrect"})
+        user_obj = User(username=username)
+        user_obj.set_password(password)
+        instance =user_obj.save()
+        c = User.objects.get(username=user_obj)
+        pid = ProductID.objects.get(Productid=p_id)
+        CustomerProd.objects.create(User=User.objects.get(id=c.id), customerid=pid)
+        return Response({"msg": "created successfully"},status=HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def pdfApiMobile(request , pk):
+    allpdfs = pdf.objects.filter(User=User.objects.get(id=pk))
+    serializer = PDFSerializer(allpdfs, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['DELETE'])
+@permission_classes((AllowAny,))
+def pdfdelete(request , pk):
+    allpdfs = pdf.objects.get(id=pk).delete()
+    return Response("deleted successfully")
+
+
+@api_view(['POST'])
+@permission_classes((AllowAny,))
+def addpdfmobile(request):
+    pdfobj = pdf.objects.create(
+        User=User.objects.get(id=request.data['id']),
+        title=request.data['title'],
+        desp=request.data['desp'],
+        Pdfstore=request.FILES['pdfstore'],
+        thumbnail = request.FILES['thumbnail'],
+        )
+    allpdfs = pdf.objects.filter(User=User.objects.get(id=request.data['id']))
+    serializer = PDFSerializer(allpdfs, many=True)
+    return Response(serializer.data)
+
+
+class logintest(KnoxLoginView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        serializer = AuthTokenSerializer(data=request.data)
+       
+        if serializer.is_valid():
+            serializer.is_valid(raise_exception=True)
+
+            user = serializer.validated_data['user']
+            login(request, user)
+            return Response({"user": UserSerializer(user).data,})
+        else:
+            return Response({
+                "user":"Invalid Creditential"
+            })
+        
+        

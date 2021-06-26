@@ -19,7 +19,7 @@
   <!-- CSS Files -->
   <link href="{% static 'assets/css/material-dashboard.css' %}" rel="stylesheet" />
   <!-- CSS Just for demo purpose, don't include it in your project -->
-  <link href="{% static 'css/demo.css' %}" rel="stylesheet" />
+  <!-- <link href="{% static 'css/demo.css' %}" rel="stylesheet" /> -->
 
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -40,9 +40,9 @@
 </script>
 <style>
   #formshow {
-    display:none;
+    display: none;
   }
-  </style>
+</style>
 </head>
 
 <body class="">
@@ -67,20 +67,20 @@
           </li>
           <li class="nav-item ">
             <a class="nav-link" href="{% url 'imagess'%}">
-              <i class="material-icons">image</i>
-              <p>Images/Upload Images</p>
+              <i class="material-icons">person</i>
+              <p>Person idenfication</p>
             </a>
           </li>
           <li class="nav-item active">
             <a class="nav-link" href="{% url 'pdf'%}">
               <i class="material-icons">book</i>
-              <p>Books/PDFS</p>
+              <p>Book reading</p>
             </a>
           </li>
           <li class="nav-item ">
             <a class="nav-link" href="{% url 'location'%}">
               <i class="material-icons">location_ons</i>
-              <p>Maps</p>
+              <p>location</p>
             </a>
           </li>
 
@@ -91,8 +91,9 @@
       <!-- Navbar -->
       <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
+
           <div class="navbar-wrapper">
-            <a class="navbar-brand" href="javascript:;">Books and PDFs</a>
+            <a class="navbar-brand" href="javascript:;">Add Books and other Document (PDF Format)</a>
           </div>
           <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index"
             aria-expanded="false" aria-label="Toggle navigation">
@@ -102,81 +103,100 @@
             <span class="navbar-toggler-icon icon-bar"></span>
           </button>
           <div class="collapse navbar-collapse justify-content-end">
-           
+
             <ul class="navbar-nav">
-              
-              
+
+
               <li class="nav-item dropdown">
                 <a class="nav-link" href="{% url 'out' %}">
                   <i class="material-icons">logout</i>
                 </a>
-               
+
               </li>
             </ul>
           </div>
         </div>
       </nav>
       <!-- End Navbar -->
+
       <div class="content">
-        <input type="button" class="btn btn-primary" id="buttonform"  value='Add new' >
-        <div id='formshow'>
-          <form action="" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group">
-              <input style="width:30%" type="text" name="title" class='form-control' id='title' placeholder='Title'>
+        <div class="container-fluid">
+          <div class="row" style="margin-top: 2%; margin-bottom: 2%;">
+            <div class="col-1 col-lg-1 col-md-1">
+              <img src="{% static 'images/11.svg' %}" class="img img-fluid mb-2" alt=""
+                style="width: 100%; height: 100%;">
             </div>
-            <input style="width:30%" type="text" name="desp" class='form-control' placeholder='Description'><br>
-            <label for="pdf">Select PDF/Book:</label>
-            <input type="file" id="myfile" name="pdf"><br><br>
-            <label for="myfile">Select a file:</label>
-            <input type="file" id="myfile" name="cover">
-            <div class="form-group">
-              <input type="submit" class="btn btn-primary" id="login">
+            <div class="col-8 col-lg-8 col-md-8" style="align-self: center; ">
+              <p style="color: #352f2f;">Click on Add Book Button to add books. isight will automatically get all these
+                books when isight is connected with wifi</p>
+
             </div>
-          </form>
+          </div>
+          <input type="button" class="btn btn-primary btn-sl btn-block" id="buttonform" value='Add Book' style="margin-bottom: 2%;">
+          <div id='formshow'>
+            <form action="" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="form-group">
+                <input style="width:50%" type="text" name="title" class='form-control' id='title' placeholder='Book Name'>
+              </div>
+              <div class="form-group">
+              <input style="width:50%" type="text" name="desp" class='form-control' placeholder='Description of Book'><br>
+            </div>
+            <div style="margin-top: -3%;">
+              <label class="form-label" for="pdf">Select Book</label>
+              <input style="width: 50%;  height: 100% !important; padding: 0px !important;"  class="form-control" type="file" id="myfile" name="pdf"><br><br>
+            </div>
+            <div style="margin-top: -3%;">
+              <label  class="form-label" for="myfile">Select Cover Image</label>
+              <input style="width: 50%;  height: 100% !important; padding: 0px !important;"  class="form-control" type="file" id="myfile" name="cover">
+            </div>
+              <div class="form-group">
+                <input style="width: 50%; margin-top: 3%;" type="submit" class="btn btn-primary" id="login">
+              </div>
+            </form>
+          </div>
+
+
+
+
+
+
+          <table class="table table-hover table-fixed" id="myTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Cover</th>
+                <th>Title</th>
+                <th>PDF</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pdf in allPdf %}
+              <tr>
+                <td>{{pdf.id}}</td>
+                <td>
+                  <image src="{{pdf.thumbnail.url}}" height="100" width="100px" name="cover" />
+                </td>
+                <td>{{ pdf.title }}</td>
+                <td>{{ pdf.Pdfstore }}
+                </td>
+                <td>{{ pdf.desp }}</td>
+                <td><a href="{{ pdf.Pdfstore.url }}" class="btn btn-sm btn-primary"><i class="fas fa-book"></i> show
+                    pdf</a>
+                  <a href="{% url 'pdfDelete' pdf.id %} " class="btn btn-sm btn-danger"><i class="fas fa-trash"></i>
+                    Delete</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
 
 
 
 
-
-
-        <table class="table table-hover table-fixed" id="myTable">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Cover</th>
-              <th>Title</th>
-              <th>PDF</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for pdf in allPdf %}
-            <tr>
-              <td>{{pdf.id}}</td>
-              <td>
-                <image src="{{pdf.thumbnail.url}}" height="100" width="100px" name="cover" />
-              </td>
-              <td>{{ pdf.title }}</td>
-              <td>{{ pdf.Pdfstore }}
-              </td>
-              <td>{{ pdf.desp }}</td>
-              <td><a href="{{ pdf.Pdfstore.url }}" class="btn btn-sm btn-primary"><i class="fas fa-book"></i> show
-                  pdf</a>
-                <a href="{% url 'pdfDelete' pdf.id %} " class="btn btn-sm btn-danger"><i class="fas fa-trash"></i>
-                  Delete</a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
       </div>
-
-
-
-
-
 
 
 

@@ -1,0 +1,294 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>isight</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <div class=" line">
+
+    </div>
+    <div class="row" style="padding-bottom: 30px;">
+        <div class="header col-md-6 col-6">
+
+            <h1 class="headerText">Welcome back to isight</h1>
+
+            <p style="padding-left: 20%; padding-right: 20%;">
+                iSight software designed for the visually impaired peoples. This software will be for
+                people with low or no visions tp help them to complete their daily Activity.
+            </p>
+            <a href="{% url 'login'%}" class="btn btn-primary rounded-pill px-4 mb-4 btn-sl btn-block">Get Started</a>
+
+
+        </div>
+        <div class="col-md-6 col-6">
+            <img src="{%static 'images/mainbg.jpg'%}" style="height: 100%;  width: 100%" />
+        </div>
+
+    </div>
+    <div class="container">
+
+
+        <div class="sec-1-index mb-5">
+
+            <div class="row">
+
+                <div class="col-md-4 col-6">
+                    <div class="mini-card text-center">
+                        <img src="{% static 'images/11.svg' %}" class="img img-fluid mb-2" alt="">
+                        <h2 class="mb-2">Book Reading</h1>
+                            <p>isight are the computing glasses with a stereo camera attached to them. The camera will
+                                be moved with the head and will capture the surrounding which the user is watching.</p>
+                            
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <div class="mini-card text-center">
+                        <img src="{% static 'images/12.svg' %}" class="img img-fluid mb-2" alt="">
+                        <h2 class="mb-2">Recognize Faces</h1>
+                            <p>isight Easily identify the person which are store in Deshboard. isight product user must take the images of person and submit the name of that person after that isight product will able to identify that person when he/she come to camera range and alert isight user through Voice</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <div class="mini-card text-center">
+                        <img src="{% static 'images/expression.png' %}" class="img img-fluid mb-2" alt="">
+                        <h2 class="mb-2">Face Expressions</h1>
+                            <p>isight identify the faces Expressions of the people and alert the user through Voice</p>
+                            
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <div class="mini-card text-center">
+                        <img src="{% static 'images/3d-printer.png' %}" class="img img-fluid mb-2"   alt="">
+                        <h2 class="mb-2">Distance Measurment</h1>
+                        <p>isight alert the user about the distance from the object.</p>
+                        
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <div class="mini-card text-center">
+                        <img src="{% static 'images/detection.jpg' %}" class="img img-fluid mb-2" alt="">
+                        <h2 class="mb-2">Object Detection</h1>
+                            <p>isight detect and identify all the obeject and alert user through voice</p>
+                            
+                    </div>
+                </div>
+                <div class="col-md-4 col-6">
+                    <div class="mini-card text-center">
+                        <img src="{% static 'images/16.svg' %}" class="img img-fluid mb-2" alt="">
+                        <h2 class="mb-2">Identify Colors</h1>
+                            <p>isight identify all the color. isight get the color of the object which are in center of the camera.</p>
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="sec-2-index mb-5" style="margin-top: 60px; margin-bottom: 60px;">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="fw-bold display-2">How Does It Work?</h2>
+                        <p class="fs20">An advanced optical sensor, captures an image of your surroundings and
+                            communicates the information audibly – completely offline.</p>
+                        <a href="" class="btn btn-primary rounded-pill px-4 mb-4">Buy Now</a>
+                </div>
+                <div class="col-md-6">
+                    <!-- <img src="{% static 'images/orcam-product-page_myeye2_v61-6_03-1-670x596.png' %}" alt=""
+                        class="img img-fluid"> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="sec-3-index mb-5">
+        <div class="container">
+            <h2 class="fw-600">isight</h1>
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                who is isight for?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                            data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                isight is suitable for all eye conditions and all levels of vision loss, as well as for people with reading fatigue and reading difficulties. The device increases independence by allowing individuals to access visual information (text, faces, products, colors,), conveyed by audio. It will not improve a person’s vision. Hearing impaired individuals would not be able to benefit from the device.
+                                isight  also requires the user to have full control over their head and hand movements.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+
+
+    <div class="sec-1-index mb-5 bg-gray pt-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 col-6 mb-5">
+                    <div class="mini-card text-center">
+                        <img src="{%static 'images/21.svg'%}" class="img img-fluid mb-2" alt="">
+                        <h2 class="mb-2">Full Page Capture</h1>
+                            <p>Unlike all other devices where you must scan word-by-word, isight Read captures full
+                                pages.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-6 mb-5">
+                    <div class="mini-card text-center">
+                        <img src="{%static 'images/23.svg'%}" class="img img-fluid mb-2" alt="">
+                        <h2 class="mb-2">Read Instantly</h1>
+                            <p>include newpapers, books, pdfs and digital text</p>
+                    </div>
+                </div>
+                
+                
+                <div class="col-md-4 col-6 mb-5">
+                    <div class="mini-card text-center">
+                        <img src="{%static 'images/21.svg'%}" class="img img-fluid mb-2" alt="">
+                        <h2 class="mb-2">Easy-to-use</h1>
+                            <p>simple show the fingure. isight will detect the fingure and start the process</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="sec-4-index mb-5 bg-gray py-4">
+        <div class="container">
+            <div class="text-center w-md-75 m-auto">
+                <h1 class="display-4 fw-bold">isight enables "independent reading experience"</h1>
+                <p class="mb-1">
+                    “Easy to use, comprehensive… text to speech reading device, such as the isight Read” is used to
+                    “increase quality of reading experiences and promote independent reading… in children with Dyslexia,
+                    with an overall goal of improving lifelong literacy outcomes.”
+                </p>
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="sec-2-index mb-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="fw-bold display-4">Just Point <br> and Click.</h2>
+                        <p class="fs20">With the press of a button, isight Read activates a laser to indicate where to
+                            start reading on any printed text or screen.</p>
+                        
+                </div>
+                <div class="col-md-6">
+                    <img src="img/lar.png" alt="" class="img img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="sec-2-index mb-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <img src="img/orcam-read2-2-1.png" alt="" class="img img-fluid">
+                </div>
+                <div class="col-md-6">
+                    <h1 class="fw-bold display-4">Hear it <br> Instantly.</h2>
+                        <p class="fs20">Any type of text is instantly converted into audio for transmission, either
+                            through the device’s tiny speaker or a connected Bluetooth device.
+                        </p>
+                        
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sec-2-index mb-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="fw-bold display-4">Read Without <br> Limitations.</h2>
+                        <p class="fs20">With the press of a button, isight Read activates a laser to indicate where to
+                            start reading on any printed text or screen. A tiny built-in speaker or connected Bluetooth
+                            device reads the text selection aloud – in real time and offline.</p>
+                        
+                </div>
+                <div class="col-md-5">
+                    <img src="img/hre.jpg" alt="" class="img img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="sec-5-index py-4 mb-5 bg-dark">
+        <div class="container text-white">
+            <h1 class="display-4 fw-bold mb-5">
+                isight Read is <br> Revolutionary
+            </h1>
+            <div class="row">
+                <div class="col-md-3 col-6 mb-4">
+                    <img src="{% static  'images/31.svg' %}" class="img img-fluid" alt="">
+                    <p>First-of-its-kind AI digital reader
+                    </p>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <img src="{% static  'images/31.svg' %}" class="img img-fluid" alt="">
+                    <p>Only device to capture full pages of text and screens
+                    </p>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <img src="{% static  'images/33.svg' %}" class="img img-fluid" alt="">
+                    <p>Instant, intuitive and easy to use
+                    </p>
+                </div>
+                <div class="col-md-3 col-6"></div>
+                <div class="col-md-3 col-6 mb-4">
+                    <img src="{% static  'images/34.svg' %}" class="img img-fluid" alt="">
+                    <p>Handheld, wireless, and lightweight
+                    </p>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <img src="{% static  'images/35.svg' %}" class="img img-fluid" alt="">
+                    <p>Offline operation – for use anywhere
+
+                    </p>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <img src="{% static  'images/35.svg' %}" class="img img-fluid" alt="">
+                    <p>No data privacy concerns
+                    </p>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="js/index.js">
+</body>
+
+</html>

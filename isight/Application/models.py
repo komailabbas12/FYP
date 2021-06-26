@@ -32,7 +32,7 @@ class Image(models.Model):
     name = models.CharField(max_length=200, null=True,blank=True)
     imagestore = models.FileField(null=True)
     def __str__(self):
-        return str(self.User)
+        return str(self.name)
 
 class FaceName(models.Model):
     User = models.ForeignKey(User, null=True ,  on_delete= models.SET_NULL)
@@ -40,6 +40,13 @@ class FaceName(models.Model):
     ids = models.PositiveIntegerField()
     def __str__(self):
         return str(self.name)
+
+class videoStore(models.Model):
+    User = models.ForeignKey(User, null=True ,  on_delete= models.SET_NULL)
+    videoFile = models.FileField(null=True)
+    def __str__(self):
+        return str(self.User)
+
 
 class ymlfile(models.Model):
     User = models.ForeignKey(User, null=True ,  on_delete= models.SET_NULL)

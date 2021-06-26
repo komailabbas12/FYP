@@ -13,7 +13,8 @@
   </title>
   <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
   <!--     Fonts and icons     -->
-  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+  <link rel="stylesheet" type="text/css"
+    href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
   <!-- CSS Files -->
   <link href="{% static 'assets/css/material-dashboard.css' %}" rel="stylesheet" />
@@ -26,14 +27,15 @@
 
 <body class="">
   <div class="wrapper ">
-    <div class="sidebar" data-color="purple" data-background-color="white" data-image="{% static 'assets/img/sidebar-1.jpg' %}">
+    <div class="sidebar" data-color="purple" data-background-color="white"
+      data-image="{% static 'assets/img/sidebar-1.jpg' %}">
       <!--
         Tip 1: You can change the color of the sidebar using: data-color="purple | azure | green | orange | danger"
 
         Tip 2: you can also add an image using data-image tag
     -->
       <div class="logo"><a href="" class="simple-text logo-normal">
-        isight
+          isight
         </a></div>
       <div class="sidebar-wrapper">
         <ul class="nav">
@@ -45,23 +47,23 @@
           </li>
           <li class="nav-item  active ">
             <a class="nav-link" href="{% url 'imagess'%}">
-              <i class="material-icons">image</i>
-              <p>Images/Upload Images</p>
+              <i class="material-icons">person</i>
+              <p>Person idenfication</p>
             </a>
           </li>
-           <li class="nav-item ">
+          <li class="nav-item ">
             <a class="nav-link" href="{% url 'pdf'%}">
               <i class="material-icons">book</i>
-              <p>Books/PDFS</p>
+              <p>Book reading</p>
             </a>
           </li>
           <li class="nav-item ">
             <a class="nav-link" href="{% url 'location'%}">
               <i class="material-icons">location_ons</i>
-              <p>Maps</p>
+              <p>location</p>
             </a>
           </li>
-         
+
         </ul>
       </div>
     </div>
@@ -80,15 +82,15 @@
             <span class="navbar-toggler-icon icon-bar"></span>
           </button>
           <div class="collapse navbar-collapse justify-content-end">
-           
+
             <ul class="navbar-nav">
-              
-              
+
+
               <li class="nav-item dropdown">
                 <a class="nav-link" href="{% url 'out' %}">
                   <i class="material-icons">logout</i>
                 </a>
-               
+
               </li>
             </ul>
           </div>
@@ -96,64 +98,101 @@
       </nav>
       <!-- End Navbar -->
       <div class="content">
-        <form action="{% url 'hello' %}"  method="POST" enctype="multipart/form-data">
-          {% csrf_token %}
-          <h5>Add new Image</h5>
-          <div class="form-group">
-            <input style="width:30%" type="text" name="name" class='form-control' id='title' placeholder='Name'>
+        <div class="row" style="margin-top: 2%; margin-bottom: 2%;">
+          <div class="col-1 col-lg-1 col-md-1">
+            <img src="{% static 'images/12.svg' %}" class="img img-fluid mb-2" alt=""
+              style="width: 100%; height: 100%;">
           </div>
-          <label for="img">Takes Images:</label>
-<!--          <input type="file"  name="imgs" ><br><br>-->
-          <input type="submit" class='btn btn-primary'>
-        </form>
-        <form action="{% url 'training' %}">
-          <label for="img">Sent Images:</label></br>
-           <input type="submit" class='btn btn-primary'>
+          <div style="align-self: center !important;" class="col-8 col-lg-8 col-md-8">
+            <p>For someone idenfication in isight product you must add 100 images of the user. don't worry we take
+              automatically 100 images of the user. Follow the following<strong> Instrunction </strong></p>
+            <p><strong>Step 01</strong> Enter the name of the person who you want to register/identify later on device
+              in input box</p>
+            <p><strong>Step 02</strong> Upload the 1min Video of that person Note the face of that person are clear in
+              camera</p>
+            <p>After upload successfully click on Submit button Our system will take images from video</p>
+            <p>After capture images successfully click on Submit button to update/send the data to isight</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-1 col-lg-1 col-md-1"></div>
+          <div class="col-11 col-lg-11 col-md-11">
+            <form action="{% url 'hello' %}" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="form-group">
+                <input style="width:50%" type="text" name="name" class='form-control' id='title'
+                  placeholder='Enter the name'>
+              </div>
+              <div style="margin-top: -2%;">
+                <label class="form-label" for="myfile">Select a Video</label>
+                <input style="width: 50%;  height: 100% !important; padding: 0px !important;" class="form-control"
+                  type="file" id="myfile" name="vide">
+              </div>
+              <input style="width: 50%; margin-top: 2%;" type="submit" class='btn btn-primary' value="Take images">
+          </div>
+          </form>
 
-        </form>
+        </div>
+        <div class="row">
+          <div class="col-1 col-lg-1 col-md-1"></div>
+          <div class="col-11 col-lg-11 col-md-11">
+            <form action="{% url 'training' %}">
 
-        <table class="table table-hover table-fixed" id="myTable">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Cover</th>
-              <th>Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for img in allimg %}
-            <tr>
-              <td>{{img.id}}</td>
-              <td>
-                <image src="{{img.imagestore.url}}" height="100" width="100px" name="cover" />
-              </td>
-              <td>{{ img.name }}</td>
-              </td>
-             
-              <td><a href="{{ img.imagestore.url }}" class="btn btn-sm btn-primary"><i class="fas fa-image"></i>  View Image</a>
-                <a href="{% url 'imgDelete' img.id %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i>
-                  Delete</a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-       
-           
-           
-            
+              <input style="width: 50%;" style="width: 50%;" type="submit" class='btn btn-primary'
+                value="Submit to isight Product">
+
+            </form>
+          </div>
+        </div>
       </div>
-         
-          
-         
-         
-               
-                   
-                   
-      
+      <div class="row">
+        <div class="col-1 col-lg-1 col-md-1"></div>
+        <div class="col-11 col-lg-11 col-md-11">
+          <table style="margin-bottom: 3%;" class="table table-hover table-fixed" id="myTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for img in allimg %}
+              <tr>
+                <td>{{img.id}}</td>
+                <!-- <td>
+              <image src="{{img.imagestore.url}}" height="100" width="100px" name="cover" />
+            </td> -->
+                <td>{{ img.name }}</td>
+                </td>
+
+                <td>
+                  <!-- <a href="{{ img.imagestore.url }}" class="btn btn-sm btn-primary"><i class="fas fa-image"></i> View
+                Image</a> -->
+                  <a href="{% url 'imgDelete' img.name %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i>
+                    Delete</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+        </div>
+        </table>
+      </div>
+
+
+
+
     </div>
+
+
+
+
+
+
+
+
   </div>
-  
+  </div>
+
   </div>
   <!--   Core JS Files   -->
   <script src="{% static 'assets/js/core/jquery.min.js' %}"></script>
@@ -175,7 +214,7 @@
   <script src="{% static 'assets/js/plugins/arrive.min.js' %}"></script>
   <!-- Include a polyfill for ES6 Promises (optional) for IE11, UC Browser and Android browser support SweetAlert -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.4.1/core.js"></script>
-  <!-- Library for adding dinamically elements -->  
+  <!-- Library for adding dinamically elements -->
   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
   <script src="{% static 'assets/js/plugins/chartist.min.js' %}"></script>
   <script src="{% static 'assets/js/plugins/bootstrap-notify.js' %}"></script>
@@ -183,8 +222,8 @@
   <script src="{% static 'assets/demo/demo.js' %}"></script>
 
   <script>
-    $(document).ready(function() {
-      $().ready(function() {
+    $(document).ready(function () {
+      $().ready(function () {
         $sidebar = $('.sidebar');
 
         $sidebar_img_container = $sidebar.find('.sidebar-background');
@@ -204,7 +243,7 @@
 
         }
 
-        $('.fixed-plugin a').click(function(event) {
+        $('.fixed-plugin a').click(function (event) {
           // Alex if we click on switch, stop propagation of the event, so the dropdown will not be hide, otherwise we set the  section active
           if ($(this).hasClass('switch-trigger')) {
             if (event.stopPropagation) {
@@ -215,7 +254,7 @@
           }
         });
 
-        $('.fixed-plugin .active-color span').click(function() {
+        $('.fixed-plugin .active-color span').click(function () {
           $full_page_background = $('.full-page-background');
 
           $(this).siblings().removeClass('active');
@@ -236,7 +275,7 @@
           }
         });
 
-        $('.fixed-plugin .background-color .badge').click(function() {
+        $('.fixed-plugin .background-color .badge').click(function () {
           $(this).siblings().removeClass('active');
           $(this).addClass('active');
 
@@ -247,7 +286,7 @@
           }
         });
 
-        $('.fixed-plugin .img-holder').click(function() {
+        $('.fixed-plugin .img-holder').click(function () {
           $full_page_background = $('.full-page-background');
 
           $(this).parent('li').siblings().removeClass('active');
@@ -257,7 +296,7 @@
           var new_image = $(this).find("img").attr('src');
 
           if ($sidebar_img_container.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
-            $sidebar_img_container.fadeOut('fast', function() {
+            $sidebar_img_container.fadeOut('fast', function () {
               $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
               $sidebar_img_container.fadeIn('fast');
             });
@@ -266,7 +305,7 @@
           if ($full_page_background.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
             var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
 
-            $full_page_background.fadeOut('fast', function() {
+            $full_page_background.fadeOut('fast', function () {
               $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
               $full_page_background.fadeIn('fast');
             });
@@ -285,7 +324,7 @@
           }
         });
 
-        $('.switch-sidebar-image input').change(function() {
+        $('.switch-sidebar-image input').change(function () {
           $full_page_background = $('.full-page-background');
 
           $input = $(this);
@@ -317,7 +356,7 @@
           }
         });
 
-        $('.switch-sidebar-mini input').change(function() {
+        $('.switch-sidebar-mini input').change(function () {
           $body = $('body');
 
           $input = $(this);
@@ -332,7 +371,7 @@
 
             $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar('destroy');
 
-            setTimeout(function() {
+            setTimeout(function () {
               $('body').addClass('sidebar-mini');
 
               md.misc.sidebar_mini_active = true;
@@ -340,12 +379,12 @@
           }
 
           // we simulate the window Resize so the charts will get updated in realtime.
-          var simulateWindowResize = setInterval(function() {
+          var simulateWindowResize = setInterval(function () {
             window.dispatchEvent(new Event('resize'));
           }, 180);
 
           // we stop the simulation of Window Resize after the animations are completed
-          setTimeout(function() {
+          setTimeout(function () {
             clearInterval(simulateWindowResize);
           }, 1000);
 
@@ -354,7 +393,7 @@
     });
   </script>
   <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
       // Javascript method's body can be found in assets/js/demos.js
       md.initDashboardPageCharts();
 
